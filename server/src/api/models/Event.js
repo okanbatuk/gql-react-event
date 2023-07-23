@@ -8,6 +8,10 @@ const eventSchema = new Schema(
     description: { type: String, required: true },
     price: { type: Number, required: true },
     date: { type: Date, required: true },
+    user_id: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+    },
   },
   { timestamps: true }
 );
