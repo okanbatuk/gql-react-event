@@ -1,3 +1,4 @@
+import { GraphQLError } from "graphql";
 import Event from "../models/Event.js";
 
 /*
@@ -5,7 +6,13 @@ import Event from "../models/Event.js";
  * */
 export const getEvents = async () => {
   const events = await Event.find().lean();
-  return events;
+
+  // If there is no event return GraphQLError
+  if (events.length > 0) return events;
+  else
+    throw new GraphQLError("There is no events..", {
+      extensions: { code: "NOT_FOUND" },
+    });
 };
 
 /*
@@ -18,13 +25,13 @@ export const createEvent = async (event) => {
       ...event,
     });
 
-    // Save the new Event
+    // Save and return the new Event
     const savedEvent = await newEvent.save();
-
     return savedEvent;
   } catch (err) {
-    console.log(err);
-    return [];
+    throw new GraphQLError(err.message, {
+      extensions: { code: "SERVER_ERROR" },
+    });
   }
 };
 
@@ -44,8 +51,9 @@ export const updateEvent = async (_id, edits) => {
     );
     return updatedEvent;
   } catch (err) {
-    console.error(err);
-    return [];
+    throw new GraphQLError(err.message, {
+      extensions: { code: "SERVER_ERROR" },
+    });
   }
 };
 
@@ -64,7 +72,8 @@ export const deleteEvent = async (_id) => {
     // If deletedCount is equal to 0 return null
     return deletedCount > 0 ? events : [];
   } catch (err) {
-    console.error(err);
-    return [];
+    throw new GraphQLError(err.message, {
+      extensions: { code: "SERVER_ERROR" },
+    });
   }
 };

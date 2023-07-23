@@ -35,15 +35,15 @@ mongoose.connection.once("open", async () => {
     // Starting server after the mongodb connection
     await server.start();
 
-    //
+    // Create route for GraphQL queries and mutations
     app.use("/graphql", expressMiddleware(server));
 
     /*
      * Error Handling
      *
      * */
-    app.use(error.notFound);
     app.use(error.converter);
+    app.use(error.notFound);
 
     // Listening to the PORT
     await new Promise((resolve, reject) => {

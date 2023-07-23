@@ -29,7 +29,7 @@ export const converter = (error, req, res, next) => {
       status: error.status || httpStatus.BAD_REQUEST,
     });
   }
-  return handler(convertedError, req, res, next);
+  return handler(convertedError, req, res);
 };
 
 export const notFound = (req, res, next) => {
@@ -37,5 +37,5 @@ export const notFound = (req, res, next) => {
     message: "NOT FOUND",
     status: httpStatus.NOT_FOUND,
   });
-  return handler(error, req, res, next);
+  return handler(error, req, res);
 };
