@@ -1,15 +1,4 @@
-import { GraphQLError } from "graphql";
-import { eventsService, authService } from "../api/services/index.js";
-
-const MAIL_REGEX =
-  /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{6,24}$/;
-
-const validation = (user) => {
-  return new Promise((resolve) => {
-    resolve(MAIL_REGEX.test(user.email) && PWD_REGEX.test(user.password));
-  });
-};
+import { eventsController, authController } from "../api/controllers/index.js";
 
 export const typeDefs = `#graphql
   type Event {
@@ -65,54 +54,14 @@ export const typeDefs = `#graphql
 export const resolvers = {
   Query: {
     hello: () => "Hello World!",
-    events: () => eventsService.getEvents(),
+    ...eventsController.queries,
   },
 
   Mutation: {
-    /*
-     * Mutations of Events (CRUD)
-     *
-     * */
-    addEvent: async (_, args) => {
-      let event = await eventsService.createEvent(args.event);
-      return event;
-    },
-    updateEvent: async (_, args) => {
-      let updatedEvent = await eventsService.updateEvent(args._id, args.edits);
-      return updatedEvent;
-    },
-    deleteEvent: async (_, args) => {
-      let events = await eventsService.deleteEvent(args._id);
-      return events;
-    },
+    // Mutations of Events
+    ...eventsController.mutations,
 
-    /*
-     * Mutations of Auth
-     */
-    register: async (_, args) => {
-      const { user } = args;
-      const validate = await validation(user);
-
-      if (!validate)
-        throw new GraphQLError("ValidationError", {
-          extensions: { code: "VALIDATION_ERROR" },
-        });
-      let newUser = await authService.register(user);
-      newUser.password = null;
-      return newUser;
-    },
-
-    login: async (_, args) => {
-      const { user } = args;
-      const validate = await validation(user);
-      if (!validate)
-        throw new GraphQLError("ValidationError", {
-          extensions: { code: "VALIDATION_ERROR" },
-        });
-
-      let result = await authService.login(user);
-      newUser.password = null;
-      return result;
-    },
+    // Mutations of Auth
+    ...authController.mutations,
   },
 };

@@ -54,8 +54,8 @@ mutation ($user: AuthInput!) {
 
 {
   "user": {
-    "email": "jane@example.com",
-    "password": "Jane!1"
+    "email": "john@example.com",
+    "password": "John!1"
   }
 }
 
@@ -95,9 +95,9 @@ mutation ($_id: ID!, $edits: UpdateEventInput!) {
 }
 
 {
-  "_id": "64bc1ac6037eea842e762af6",
+  "_id": "64bd83ea8fd26488d2da332a",
   "edits": {
-    "title": "Cooking",
+    "title": "Writing",
     "description": "new DESC",
     "price": 9.99
   }
@@ -119,7 +119,7 @@ mutation ($_id: ID!) {
 }
 
 {
-  "_id": "64bce12b5e85317dd7e824fc"
+  "_id": "64bd83fb8fd26488d2da332c"
 }
 
 ###
