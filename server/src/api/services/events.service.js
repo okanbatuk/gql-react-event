@@ -16,6 +16,29 @@ export const getEvents = async () => {
 };
 
 /*
+ * Get event according to _id
+ *
+ * */
+export const getEventById = async (_id) => {
+  const event = await Event.findOne({ _id }).lean();
+
+  if (!event)
+    throw new GraphQLError("Event doesn't exist..", {
+      extensions: { code: "404_NOT_FOUND" },
+    });
+  return event;
+};
+
+/*
+ * Get events according to user_id
+ *
+ */
+export const getEventsByUserId = async (_id) => {
+  const events = await Event.find({ _id }, { _id }).lean();
+  return events;
+};
+
+/*
  * Create a new Event
  */
 export const createEvent = async (event) => {
