@@ -1,4 +1,8 @@
-import { eventsController, authController } from "../api/controllers/index.js";
+import {
+  eventsController,
+  authController,
+  usersController,
+} from "../api/controllers/index.js";
 
 export const typeDefs = `#graphql
   type Event {
@@ -6,18 +10,22 @@ export const typeDefs = `#graphql
     title: String!
     description: String!
     price: Float!
-    date: String!    
+    date: String!
+    user_id: ID!
   }
 
   type User {
     _id: ID!
     email: String!
     password: String
+    createdEvents: [ID!]
   }
 
   type Query {
     hello: String
     events: [Event]
+    users: [User]
+    user(_id: ID!): User
   }
 
   type Mutation {
@@ -36,6 +44,7 @@ export const typeDefs = `#graphql
     description: String!
     price: Float!
     date: String!
+    user_id: ID!
   }
 
   input UpdateEventInput {
@@ -55,6 +64,7 @@ export const resolvers = {
   Query: {
     hello: () => "Hello World!",
     ...eventsController.queries,
+    ...usersController.queries,
   },
 
   Mutation: {
