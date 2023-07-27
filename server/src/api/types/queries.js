@@ -3,7 +3,7 @@ type Query {
   hello: String
 
   events: [Event]
-  event: Event
+  event(_id: ID!): Event
 
   users: [User]
   user(_id: ID!): User
