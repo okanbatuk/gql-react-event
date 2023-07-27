@@ -177,6 +177,7 @@ query ($_id: ID!) {
     createdEvents {
       title
       description
+      date
     }
   }
 }

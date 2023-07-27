@@ -5,7 +5,10 @@ import Event from "../models/Event.js";
  * */
 export const getEvents = async () => {
   const events = await Event.find().lean();
-  return events;
+
+  return events.map((event) => {
+    return { ...event, date: new Date(event.date).toISOString() };
+  });
 };
 
 /*
@@ -14,7 +17,7 @@ export const getEvents = async () => {
  * */
 export const getEventById = async (_id) => {
   const event = await Event.findOne({ _id }).lean();
-  return event;
+  return { ...event, date: new Date(event.date).toISOString() };
 };
 
 /*
@@ -23,7 +26,9 @@ export const getEventById = async (_id) => {
  * */
 export const getUserEvents = async (userId) => {
   const events = await Event.find({ creator: userId }).lean();
-  return events;
+  return events.map((event) => {
+    return { ...event, date: new Date(event.date).toISOString() };
+  });
 };
 
 /*
