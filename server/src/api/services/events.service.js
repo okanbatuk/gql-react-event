@@ -1,4 +1,3 @@
-import { GraphQLError } from "graphql";
 import Event from "../models/Event.js";
 
 /*
@@ -6,13 +5,7 @@ import Event from "../models/Event.js";
  * */
 export const getEvents = async () => {
   const events = await Event.find().lean();
-
-  // If there is no event return GraphQLError
-  if (events.length > 0) return events;
-  else
-    throw new GraphQLError("There is no events..", {
-      extensions: { code: "NOT_FOUND" },
-    });
+  return events;
 };
 
 /*
@@ -21,28 +14,14 @@ export const getEvents = async () => {
  * */
 export const getEventById = async (_id) => {
   const event = await Event.findOne({ _id }).lean();
-
-  if (!event)
-    throw new GraphQLError("Event doesn't exist..", {
-      extensions: { code: "404_NOT_FOUND" },
-    });
   return event;
-};
-
-/*
- * Get events according to user_id
- *
- */
-export const getEventsByUserId = async (_id) => {
-  const events = await Event.find({ _id }, { _id }).lean();
-  return events;
 };
 
 /*
  * Create a new Event
  */
 export const createEvent = async (event) => {
-  try {
+  return new Promise(async (resolve, reject) => {
     // Create a new Event
     const newEvent = new Event({
       ...event,
@@ -50,12 +29,13 @@ export const createEvent = async (event) => {
 
     // Save and return the new Event
     const savedEvent = await newEvent.save();
-    return savedEvent;
-  } catch (err) {
-    throw new GraphQLError(err.message, {
-      extensions: { code: "SERVER_ERROR" },
-    });
-  }
+    savedEvent
+      ? resolve(savedEvent)
+      : reject({
+          message: "Event didn't save",
+          code: "500_INTERNAL_SERVER_ERROR",
+        });
+  });
 };
 
 /*
@@ -63,7 +43,7 @@ export const createEvent = async (event) => {
  *
  * */
 export const updateEvent = async (_id, edits) => {
-  try {
+  return new Promise(async (resolve, reject) => {
     // Update the event according to _id
     const updatedEvent = await Event.findOneAndUpdate(
       { _id },
@@ -72,12 +52,13 @@ export const updateEvent = async (_id, edits) => {
       },
       { returnDocument: "after" }
     );
-    return updatedEvent;
-  } catch (err) {
-    throw new GraphQLError(err.message, {
-      extensions: { code: "SERVER_ERROR" },
-    });
-  }
+    updateEvent
+      ? resolve(updatedEvent)
+      : reject({
+          message: "Event didn't update.",
+          code: "500_INTERNAL_SERVER_ERROR",
+        });
+  });
 };
 
 /*
@@ -85,7 +66,7 @@ export const updateEvent = async (_id, edits) => {
  *
  * */
 export const deleteEvent = async (_id) => {
-  try {
+  return new Promise(async (resolve, reject) => {
     // Delete the event according to _id
     const { deletedCount } = await Event.deleteOne({ _id });
 
@@ -93,10 +74,11 @@ export const deleteEvent = async (_id) => {
     const events = await Event.find().lean();
 
     // If deletedCount is equal to 0 return null
-    return deletedCount > 0 ? events : [];
-  } catch (err) {
-    throw new GraphQLError(err.message, {
-      extensions: { code: "SERVER_ERROR" },
-    });
-  }
+    deletedCount
+      ? resolve(events)
+      : reject({
+          message: "Event didn't delete",
+          code: "500_INTERNAL_SERVER_ERROR",
+        });
+  });
 };

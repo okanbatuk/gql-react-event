@@ -1,25 +1,23 @@
-import mongoose from "mongoose";
-import { GraphQLError } from "graphql";
 import User from "../models/User.js";
-
-const { Types } = mongoose;
 
 // Get All Users
 export const getAll = async () => {
-  const users = await User.find().lean();
-  return users;
+  return new Promise(async (resolve, reject) => {
+    const users = await User.find().lean();
+    users.length
+      ? resolve(users)
+      : reject({ message: "There is no user..", code: "404_NOT_FOUND" });
+  });
 };
 
 // Get User according to objectId
 export const getUserById = async (_id) => {
-  const user = await User.findById(_id).lean();
-
-  if (!user)
-    throw new GraphQLError("There is no user..", {
-      extensions: { code: "404_NOT_FOUND" },
-    });
-
-  return user;
+  return new Promise(async (resolve, reject) => {
+    const user = await User.findById(_id).lean();
+    user
+      ? resolve(user)
+      : reject({ message: "There is no user..", code: "404_NOT_FOUND" });
+  });
 };
 
 // Push the event id to user's prop when creating new event
@@ -30,12 +28,7 @@ export const findAndAddEvent = async (_id, event_id) => {
     { $push: { createdEvents: event_id } }
   );
 
-  if (modifiedCount <= 0)
-    throw new GraphQLError(err.message, {
-      extensions: { code: "500_INTERNAL_SERVER_ERROR" },
-    });
-
-  const user = await User.findById(_id).lean();
+  const user = modifiedCount && (await User.findById(_id).lean());
 
   return user;
 };
@@ -47,12 +40,7 @@ export const findAndDeleteEvent = async (_id, event_id) => {
     { $pull: { createdEvents: event_id } }
   );
 
-  if (modifiedCount <= 0)
-    throw new GraphQLError(err.message, {
-      extensions: { code: "500_INTERNAL_SERVER_ERROR" },
-    });
-
-  const user = await User.findById(_id).lean();
+  const user = modifiedCount && (await User.findById(_id).lean());
 
   return user;
 };
