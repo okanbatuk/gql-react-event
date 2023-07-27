@@ -18,6 +18,15 @@ export const getEventById = async (_id) => {
 };
 
 /*
+ * Get user's events
+ *
+ * */
+export const getUserEvents = async (userId) => {
+  const events = await Event.find({ creator: userId }).lean();
+  return events;
+};
+
+/*
  * Create a new Event
  */
 export const createEvent = async (event) => {

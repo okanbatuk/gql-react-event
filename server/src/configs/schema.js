@@ -11,6 +11,10 @@ export const resolvers = {
     ...controllers.usersController.queries,
   },
 
+  // Relations
+  ...controllers.eventsController.relations,
+  ...controllers.usersController.relations,
+
   Mutation: {
     // Mutations of Events
     ...controllers.eventsController.mutations,

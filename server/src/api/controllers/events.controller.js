@@ -26,20 +26,35 @@ const queries = {
   },
 };
 
+const relations = {
+  User: {
+    createdEvents: async (parent) => {
+      try {
+        const events = await eventsService.getUserEvents(parent._id);
+        return events;
+      } catch (err) {
+        throw new GraphQLError(err.message, {
+          extensions: { code: err.code },
+        });
+      }
+    },
+  },
+};
+
 const mutations = {
   addEvent: async (_, args) => {
     try {
       const { event } = args;
 
-      // Check user by user_id
-      await usersService.getUserById(event.user_id);
+      // Check user by creator id
+      await usersService.getUserById(event.creator);
 
       // Create and return new Event
       const newEvent = await eventsService.createEvent(args.event);
 
       // Push the new Event id to user.createdEvents array
       const savedUser = await usersService.findAndAddEvent(
-        event.user_id,
+        event.creator,
         newEvent._id
       );
 
@@ -82,7 +97,7 @@ const mutations = {
 
       // Delete the event id on user before deleting the event
       const user = await usersService.findAndDeleteEvent(
-        event.user_id,
+        event.creator,
         event._id
       );
 
@@ -101,4 +116,4 @@ const mutations = {
   },
 };
 
-export { queries, mutations };
+export { queries, relations, mutations };

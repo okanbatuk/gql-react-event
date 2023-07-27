@@ -26,18 +26,17 @@ mutation ($event: AddEventInput!) {
     title
     description
     price
-    date
-    user_id 
+    date 
   }
 }
 
 {
   "event": {
-    "title": "Cooking",
+    "title": "Writing",
     "description": "This is a desc.",
-    "price": 9.99,
+    "price": 29.99,
     "date": "2023-07-23T05:14:27.979Z",
-    "user_id": "64beb21c383b7d285d1339e6"
+    "creator": "64beb21c383b7d285d1339e7"
   }
 }
 
@@ -136,7 +135,34 @@ query {
     description
     price
     date
+    creator {
+      _id
+      email
+    }
   }
+}
+
+###
+POST http://localhost:4000/graphql HTTP/1.1
+X-Request-Type: GraphQL
+Content-Type: application/json
+
+query ($_id: ID!) {
+  event(_id: $_id) {
+    _id
+    title
+    description
+    price
+    date
+    creator {
+      _id
+      email
+    }
+  }
+}
+
+{
+  "_id": "64c2b6df5da11466e59c8617"
 }
 
 ###
@@ -147,7 +173,11 @@ Content-Type: application/json
 query ($_id: ID!) {
   user(_id: $_id) {
     _id
-    createdEvents
+    email
+    createdEvents {
+      title
+      description
+    }
   }
 }
 
