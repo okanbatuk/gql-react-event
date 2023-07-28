@@ -31,13 +31,24 @@ const queries = {
 };
 
 const relations = {
-  User: {
-    createdEvents: async (parent) => {
-      const events = await eventsService.getUserEvents(parent._id);
-      return events.map((event) => {
-        return { ...event, date: new Date(event.date).toISOString() };
+  createdEvents: async (parent) => {
+    const events = await eventsService.getUserEvents(parent._id);
+    return events.map((event) => {
+      return { ...event, date: new Date(event.date).toISOString() };
+    });
+  },
+
+  event: async (parent) => {
+    try {
+      const event = await eventsService.getEventById(parent.event);
+      if (_.isEmpty(event))
+        throw { message: "There is no user..", code: "404_NOT_FOUND" };
+      return { ...event, date: new Date(event.date).toISOString() };
+    } catch (err) {
+      throw new GraphQLError(err.message, {
+        extensions: { code: err.code },
       });
-    },
+    }
   },
 };
 

@@ -33,7 +33,7 @@ mutation ($event: AddEventInput!) {
 {
   "event": {
     "title": "Visit Anitkabir",
-    "description": "New desc 2",
+    "description": "New desc 1",
     "price": 109.99,
     "date": "2023-07-23T05:14:27.979Z",
     "creator": "64beb21c383b7d285d1339e7"
@@ -120,7 +120,7 @@ mutation ($_id: ID!) {
 }
 
 {
-  "_id": "64c3bae20322922e5cf2205e"
+  "_id": "64c3bc358fb2086a10b9b68f"
 }
 
 ###
@@ -137,7 +137,7 @@ mutation ($event: ID!, $user: ID!) {
 }
 
 {
-  "event": "64c3a6fe3d81c1e734eface4",
+  "event": "64c3caf57d88383cc432fac4",
   "user": "64beb21c383b7d285d1339e7"
 }
 
@@ -168,6 +168,14 @@ Content-Type: application/json
 query {
   bookings {
     _id
+    event {
+      title
+      description
+      price
+    }
+    user {
+      email
+    }
   }
 }
 

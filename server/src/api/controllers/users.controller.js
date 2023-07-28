@@ -6,17 +6,26 @@ export const queries = {
 };
 
 export const relations = {
-  Event: {
-    creator: async (parent) => {
-      try {
-        const user = await usersService.getUserById(parent.creator);
-        return user;
-      } catch (err) {
-        throw new GraphQLError(err.message, {
-          extensions: { code: err.code },
-        });
-      }
-    },
+  creator: async (parent) => {
+    try {
+      const user = await usersService.getUserById(parent.creator);
+      return user;
+    } catch (err) {
+      throw new GraphQLError(err.message, {
+        extensions: { code: err.code },
+      });
+    }
+  },
+
+  user: async (parent) => {
+    try {
+      const user = await usersService.getUserById(parent.user);
+      return user;
+    } catch (err) {
+      throw new GraphQLError(err.message, {
+        extensions: { code: err.code },
+      });
+    }
   },
 };
 

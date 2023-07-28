@@ -9,11 +9,22 @@ export const resolvers = {
     hello: () => "Hello World!",
     ...controllers.eventsController.queries,
     ...controllers.usersController.queries,
+    ...controllers.bookingsController.queries,
   },
 
   // Relations
-  ...controllers.eventsController.relations,
-  ...controllers.usersController.relations,
+  User: {
+    createdEvents: controllers.eventsController.relations.createdEvents,
+  },
+
+  Booking: {
+    event: controllers.eventsController.relations.event,
+    user: controllers.usersController.relations.user,
+  },
+
+  Event: {
+    creator: controllers.usersController.relations.creator,
+  },
 
   Mutation: {
     // Mutations of Events
@@ -21,5 +32,8 @@ export const resolvers = {
 
     // Mutations of Auth
     ...controllers.authController.mutations,
+
+    // Mutations of Bookings
+    ...controllers.bookingsController.mutations,
   },
 };
