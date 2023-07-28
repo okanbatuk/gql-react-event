@@ -61,9 +61,7 @@ const mutations = {
       // If update didn't successfully, delete the event and return error
       if (!savedUser) {
         await eventsService.deleteEvent(newEvent._id);
-        throw new GraphQLError("Something went wrong..", {
-          extensions: { code: "400_BAD_REQUEST" },
-        });
+        throw { message: "Something went wrong..", code: "400_BAD_REQUEST" };
       }
 
       return newEvent;
@@ -91,9 +89,7 @@ const mutations = {
       const event = await eventsService.getEventById(args._id);
 
       if (!event)
-        throw new GraphQLError("Event doesn't exist..", {
-          extensions: { code: "404_NOT_FOUND" },
-        });
+        throw { message: "Event doesn't exist..", code: "404_NOT_FOUND" };
 
       // Delete the event id on user before deleting the event
       const user = await usersService.findAndDeleteEvent(
@@ -103,9 +99,10 @@ const mutations = {
 
       // If there is no updated user return GraphQL Error
       if (!user)
-        throw new GraphQLError("This event is not associated with any user..", {
-          extensions: { code: "500_INTERNAL_SERVER_ERROR" },
-        });
+        throw {
+          message: "This event is not associated with any user..",
+          code: "500_INTERNAL_SERVER_ERROR",
+        };
 
       // Delete the event and return the new Event List
       let newEventList = await eventsService.deleteEvent(event._id);

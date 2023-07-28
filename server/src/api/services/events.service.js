@@ -1,3 +1,4 @@
+import _ from "lodash";
 import Event from "../models/Event.js";
 
 /*
@@ -17,7 +18,9 @@ export const getEvents = async () => {
  * */
 export const getEventById = async (_id) => {
   const event = await Event.findOne({ _id }).lean();
-  return { ...event, date: new Date(event.date).toISOString() };
+  return (
+    !_.isEmpty(event) && { ...event, date: new Date(event.date).toISOString() }
+  );
 };
 
 /*
@@ -43,8 +46,10 @@ export const createEvent = async (event) => {
 
     // Save and return the new Event
     const savedEvent = await newEvent.save();
-    savedEvent
-      ? resolve(savedEvent)
+    const createdEvent = await getEventById(savedEvent._id);
+
+    createdEvent
+      ? resolve(createdEvent)
       : reject({
           message: "Event didn't save",
           code: "500_INTERNAL_SERVER_ERROR",
