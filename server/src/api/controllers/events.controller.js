@@ -1,3 +1,4 @@
+import _ from "lodash";
 import { GraphQLError } from "graphql";
 import { eventsService, usersService } from "../services/index.js";
 
@@ -11,32 +12,31 @@ const queries = {
       throw new GraphQLError("There is no events..", {
         extensions: { code: "404_NOT_FOUND" },
       });
-    return events;
+
+    return events.map((event) => {
+      return { ...event, date: new Date(event.date).toISOString() };
+    });
   },
-  event: async (_, args) => {
+  event: async (...[, args]) => {
     // Get event according to _id
     const event = await eventsService.getEventById(args._id);
 
     // If event doesn't exist return error
-    if (!event)
+    if (_.isEmpty(event))
       throw new GraphQLError("There is no event..", {
         extensions: { code: "404_NOT_FOUND" },
       });
-    return event;
+    return { ...event, date: new Date(event.date).toISOString() };
   },
 };
 
 const relations = {
   User: {
     createdEvents: async (parent) => {
-      try {
-        const events = await eventsService.getUserEvents(parent._id);
-        return events;
-      } catch (err) {
-        throw new GraphQLError(err.message, {
-          extensions: { code: err.code },
-        });
-      }
+      const events = await eventsService.getUserEvents(parent._id);
+      return events.map((event) => {
+        return { ...event, date: new Date(event.date).toISOString() };
+      });
     },
   },
 };
@@ -64,7 +64,10 @@ const mutations = {
         throw { message: "Something went wrong..", code: "400_BAD_REQUEST" };
       }
 
-      return newEvent;
+      return {
+        ...newEvent._doc,
+        date: new Date(newEvent._doc.date).toISOString(),
+      };
     } catch (err) {
       throw new GraphQLError(err.message, {
         extensions: { code: err.code },
@@ -106,7 +109,9 @@ const mutations = {
 
       // Delete the event and return the new Event List
       let newEventList = await eventsService.deleteEvent(event._id);
-      return newEventList;
+      return newEventList.map((event) => {
+        return { ...event, date: new Date(event.date).toISOString() };
+      });
     } catch (err) {
       throw new GraphQLError(err.message, { extensions: { code: err.code } });
     }
