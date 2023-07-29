@@ -11,6 +11,7 @@ type Mutation {
 
   # Type of Booking Mutations
   bookEvent(event: ID!,user: ID!): Booking!
+  cancelBooking(_id: ID!): Event!
 }`;
 
 export default mutations;

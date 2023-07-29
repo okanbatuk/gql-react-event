@@ -42,6 +42,29 @@ const mutations = {
       });
     }
   },
+  cancelBooking: async (...[, args]) => {
+    try {
+      const booking = await services.bookingsService.getBookingById(args._id);
+      if (_.isEmpty(booking))
+        throw { message: "Booking not found!!", code: "404_NOT_FOUND" };
+
+      const canceledEvent = {
+        ...booking.event,
+      };
+      if (_.isEmpty(canceledEvent))
+        throw {
+          message: "Event is missing..",
+          code: "500_INTERNAL_SERVER_ERROR",
+        };
+
+      await services.bookingsService.deleteBooking(booking._id);
+      return transformData(canceledEvent);
+    } catch (err) {
+      throw new GraphQLError(err.message, {
+        extensions: { code: err.code },
+      });
+    }
+  },
 };
 
 export { queries, mutations };
