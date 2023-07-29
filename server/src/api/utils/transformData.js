@@ -1,15 +1,17 @@
+import convertDate from "./convertDate.js";
+
 // Transform the data
-export const transformData = (data = {}) => {
+export default (data = {}) => {
   return data.hasOwnProperty("date")
     ? {
         ...data,
-        date: new Date(data.date).toISOString(),
-        createdAt: new Date(data.createdAt).toISOString(),
-        updatedAt: new Date(data.updatedAt).toISOString(),
+        date: convertDate(data.date),
+        createdAt: convertDate(data.createdAt),
+        updatedAt: convertDate(data.updatedAt),
       }
     : {
         ...data,
-        createdAt: new Date(data.createdAt).toISOString(),
-        updatedAt: new Date(data.updatedAt).toISOString(),
+        createdAt: convertDate(data.createdAt),
+        updatedAt: convertDate(data.updatedAt),
       };
 };

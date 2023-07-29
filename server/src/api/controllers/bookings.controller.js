@@ -1,7 +1,7 @@
 import _ from "lodash";
 import { GraphQLError } from "graphql";
 import * as services from "../services/index.js";
-import { transformData } from "../utils/transformData.js";
+import transformData from "../utils/transformData.js";
 
 const queries = {
   bookings: async () => {
