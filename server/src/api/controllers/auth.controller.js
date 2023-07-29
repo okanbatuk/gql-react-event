@@ -26,15 +26,40 @@ export const mutations = {
   },
 
   login: async (_, args) => {
-    const { user } = args;
-    const validate = await validation(user);
-    if (!validate)
-      throw new GraphQLError("ValidationError", {
-        extensions: { code: "VALIDATION_ERROR" },
-      });
+    try {
+      const { user } = args;
 
-    let loginUser = await authService.login(user);
-    loginUser.password = null;
-    return loginUser;
+      // Validate the user body
+      const validate = await validation(user);
+      if (!validate)
+        throw { message: "ValidationError", code: "400_VALIDATION_ERROR" };
+
+      // Get the user who wants to login
+      let loginUser = await authService.login(user);
+
+      // Import generate token function
+      const { default: generateToken } = await import(
+        "../utils/generateToken.js"
+      );
+
+      // Generate new Token
+      let accessToken = await generateToken({ user: loginUser.email });
+
+      if (!accessToken)
+        throw {
+          message: "Something went wrong",
+          code: "500_INTERNAL_SERVER_ERROR",
+        };
+
+      // TODO: Generate new return type for user Login
+      // TODO: Add prop to return type for new token
+
+      loginUser.password = null;
+      return loginUser;
+    } catch (err) {
+      throw new GraphQLError(err.message, {
+        extensions: { code: err.code },
+      });
+    }
   },
 };

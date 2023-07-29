@@ -3,7 +3,8 @@ import { config } from "dotenv-safe";
 
 let env = "",
   port = "",
-  db = "";
+  db = "",
+  tokenSecret = "";
 
 config({
   allowEmptyValues: true,
@@ -14,6 +15,7 @@ config({
   env = process.env.NODE_ENV;
   port = process.env.PORT;
   db = process.env.MONGO;
+  tokenSecret = process.env.ACCESS_TOKEN_SECRET;
 })();
 
-export { env, port, db };
+export { env, port, db, tokenSecret };
