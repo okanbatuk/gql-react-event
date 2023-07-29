@@ -1,6 +1,7 @@
 import _ from "lodash";
 import { GraphQLError } from "graphql";
 import * as services from "../services/index.js";
+import { transformData } from "../utils/transformData.js";
 
 const queries = {
   bookings: async () => {
@@ -13,11 +14,7 @@ const queries = {
 
     // Convert to dates
     return bookings.map((booking) => {
-      return {
-        ...booking,
-        createdAt: new Date(booking.createdAt).toISOString(),
-        updatedAt: new Date(booking.updatedAt).toISOString(),
-      };
+      return transformData(booking);
     });
   },
 };
@@ -38,12 +35,7 @@ const mutations = {
         args.user
       );
 
-      return {
-        ...newBooking.doc,
-        _id: newBooking.doc.id,
-        createdAt: new Date(newBooking.doc.createdAt).toISOString(),
-        updatedAt: new Date(newBooking.doc.updatedAt).toISOString(),
-      };
+      return transformData(newBooking._doc);
     } catch (err) {
       throw new GraphQLError(err.message, {
         extensions: { code: err.code },
