@@ -22,7 +22,7 @@ export const register = async (user) => {
     // If there is no conflicting user and not created user
     if (!newUser)
       throw new GraphQLError("Something went wrong..", {
-        extensions: { code: "500_OPERATION_FAILURE" },
+        extensions: { code: "INTERNAL_SERVER_ERROR", http: 500 },
       });
 
     // Save and return the newUser
@@ -31,7 +31,7 @@ export const register = async (user) => {
   } else {
     // If there is a conflict user return GraphQLError
     throw new GraphQLError("Username or email already in use..", {
-      extensions: { code: "409_CONFLICT" },
+      extensions: { code: "CONFLICT", http: 409 },
     });
   }
 };
@@ -48,13 +48,13 @@ export const login = async (userInfo) => {
 
     if (!user || !comparePwd)
       throw new GraphQLError("Email or Password is incorrect.", {
-        extensions: { code: "401_UNAUTHORIZED" },
+        extensions: { code: "UNAUTHORIZED", http: 401 },
       });
 
     return user;
   } catch (err) {
     throw new GraphQLError(err.message, {
-      extensions: { code: "500_OPERATION_FAILURE" },
+      extensions: { code: "INTERNAL_SERVER_ERROR", http: 500 },
     });
   }
 };

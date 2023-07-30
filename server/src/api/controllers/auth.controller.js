@@ -18,7 +18,7 @@ export const mutations = {
 
     if (!validate)
       throw new GraphQLError("ValidationError", {
-        extensions: { code: "VALIDATION_ERROR" },
+        extensions: { code: "VALIDATION_ERROR", http: 400 },
       });
     let newUser = await authService.register(user);
     return newUser;
@@ -31,7 +31,11 @@ export const mutations = {
       // Validate the user body
       const validate = await validation(user);
       if (!validate)
-        throw { message: "ValidationError", code: "400_VALIDATION_ERROR" };
+        throw {
+          message: "ValidationError",
+          code: "VALIDATION_ERROR",
+          status: 400,
+        };
 
       // Get the user who wants to login
       let loginUser = await authService.login(user);
@@ -47,7 +51,8 @@ export const mutations = {
       if (!accessToken)
         throw {
           message: "Something went wrong",
-          code: "500_INTERNAL_SERVER_ERROR",
+          code: "INTERNAL_SERVER_ERROR",
+          status: 500,
         };
 
       return {
@@ -58,7 +63,7 @@ export const mutations = {
       };
     } catch (err) {
       throw new GraphQLError(err.message, {
-        extensions: { code: err.code },
+        extensions: { code: err.code, http: err.status },
       });
     }
   },

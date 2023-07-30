@@ -29,7 +29,8 @@ export const bookEvent = (eventId, userId) => {
       ? resolve(savedBooking)
       : reject({
           message: "Booking not created!",
-          code: "500_INTERNAL_SERVER_ERROR",
+          code: "INTERNAL_SERVER_ERROR",
+          status: 500,
         });
   });
 };
@@ -43,7 +44,8 @@ export const deleteBooking = (bookingId) => {
       ? resolve(true)
       : reject({
           message: "Booking not cancelled!",
-          code: "500_INTERNAL_SERVER_ERROR",
+          code: "INTERNAL_SERVER_ERROR",
+          status: 500,
         });
   });
 };

@@ -42,7 +42,8 @@ export const createEvent = async (event) => {
       ? resolve(savedEvent)
       : reject({
           message: "Event didn't save",
-          code: "500_INTERNAL_SERVER_ERROR",
+          code: "INTERNAL_SERVER_ERROR",
+          status: 500,
         });
   });
 };
@@ -65,7 +66,8 @@ export const updateEvent = async (_id, edits) => {
       ? resolve(updatedEvent)
       : reject({
           message: "Event didn't update.",
-          code: "500_INTERNAL_SERVER_ERROR",
+          code: "INTERNAL_SERVER_ERROR",
+          status: 500,
         });
   });
 };
@@ -87,7 +89,8 @@ export const deleteEvent = async (_id) => {
       ? resolve(events)
       : reject({
           message: "Event didn't delete",
-          code: "500_INTERNAL_SERVER_ERROR",
+          code: "INTERNAL_SERVER_ERROR",
+          status: 500,
         });
   });
 };

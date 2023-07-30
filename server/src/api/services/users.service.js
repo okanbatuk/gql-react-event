@@ -6,7 +6,11 @@ export const getAll = async () => {
     const users = await User.find().lean();
     users.length
       ? resolve(users)
-      : reject({ message: "There is no user..", code: "404_NOT_FOUND" });
+      : reject({
+          message: "There is no user..",
+          code: "NOT_FOUND",
+          status: 404,
+        });
   });
 };
 
@@ -16,7 +20,11 @@ export const getUserById = async (_id) => {
     const user = await User.findById(_id).lean();
     user
       ? resolve(user)
-      : reject({ message: "There is no user..", code: "404_NOT_FOUND" });
+      : reject({
+          message: "There is no user..",
+          code: "NOT_FOUND",
+          status: 404,
+        });
   });
 };
 

@@ -5,18 +5,27 @@ import transformData from "../utils/transformData.js";
 
 const queries = {
   events: async () => {
-    // Get All Events
-    const events = await eventsService.getEvents();
+    try {
+      // Get All Events
+      const events = await eventsService.getEvents();
 
-    // If there is no events return error
-    if (!events.length)
-      throw new GraphQLError("There is no events..", {
-        extensions: { code: "404_NOT_FOUND" },
+      // If there is no events return error
+      if (!events.length)
+        throw {
+          message: "There is no events..",
+          code: "NOT_FOUND",
+          status: 404,
+        };
+
+      // Convert the date props
+      return events.map((event) => {
+        return transformData(event);
       });
-
-    return events.map((event) => {
-      return transformData(event);
-    });
+    } catch (err) {
+      throw new GraphQLError(err.message, {
+        extensions: { code: err.code, http: err.status },
+      });
+    }
   },
   event: async (...[, args]) => {
     // Get event according to _id
@@ -25,7 +34,7 @@ const queries = {
     // If event doesn't exist return error
     if (_.isEmpty(event))
       throw new GraphQLError("There is no event..", {
-        extensions: { code: "404_NOT_FOUND" },
+        extensions: { code: "NOT_FOUND", http: 404 },
       });
     return transformData(event);
   },
@@ -43,11 +52,11 @@ const relations = {
     try {
       const event = await eventsService.getEventById(parent.event);
       if (_.isEmpty(event))
-        throw { message: "There is no user..", code: "404_NOT_FOUND" };
+        throw { message: "There is no user..", code: "NOT_FOUND", status: 404 };
       return transformData(event);
     } catch (err) {
       throw new GraphQLError(err.message, {
-        extensions: { code: err.code },
+        extensions: { code: err.code, http: err.status },
       });
     }
   },
@@ -73,13 +82,17 @@ const mutations = {
       // If update didn't successfully, delete the event and return error
       if (!savedUser) {
         await eventsService.deleteEvent(newEvent._id);
-        throw { message: "Something went wrong..", code: "400_BAD_REQUEST" };
+        throw {
+          message: "Something went wrong..",
+          code: "BAD_REQUEST",
+          status: 400,
+        };
       }
 
       return transformData(newEvent._doc);
     } catch (err) {
       throw new GraphQLError(err.message, {
-        extensions: { code: err.code },
+        extensions: { code: err.code, http: err.status },
       });
     }
   },
@@ -90,7 +103,9 @@ const mutations = {
       let updatedEvent = await eventsService.updateEvent(args._id, args.edits);
       return updatedEvent;
     } catch (err) {
-      throw new GraphQLError(err.message, { extensions: { code: err.code } });
+      throw new GraphQLError(err.message, {
+        extensions: { code: err.code, http: err.status },
+      });
     }
   },
 
@@ -113,7 +128,8 @@ const mutations = {
       if (!user)
         throw {
           message: "This event is not associated with any user..",
-          code: "500_INTERNAL_SERVER_ERROR",
+          code: "INTERNAL_SERVER_ERROR",
+          status: 500,
         };
 
       // Delete the event and return the new Event List
@@ -122,7 +138,9 @@ const mutations = {
         return transformData(event);
       });
     } catch (err) {
-      throw new GraphQLError(err.message, { extensions: { code: err.code } });
+      throw new GraphQLError(err.message, {
+        extensions: { code: err.code, http: err.status },
+      });
     }
   },
 };

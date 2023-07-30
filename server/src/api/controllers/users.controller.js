@@ -12,7 +12,7 @@ export const relations = {
       return user;
     } catch (err) {
       throw new GraphQLError(err.message, {
-        extensions: { code: err.code },
+        extensions: { code: err.code, http: err.status },
       });
     }
   },
@@ -23,7 +23,7 @@ export const relations = {
       return user;
     } catch (err) {
       throw new GraphQLError(err.message, {
-        extensions: { code: err.code },
+        extensions: { code: err.code, http: err.status },
       });
     }
   },

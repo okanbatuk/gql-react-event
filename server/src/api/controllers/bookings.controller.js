@@ -9,7 +9,7 @@ const queries = {
 
     if (!bookings.length)
       throw new GraphQLError("There is no Booking", {
-        extensions: { code: "404_NOT_FOUND" },
+        extensions: { code: "NOT_FOUND", http: 404 },
       });
 
     // Convert to dates
@@ -24,11 +24,11 @@ const mutations = {
     try {
       const event = await services.eventsService.getEventById(args.event);
       if (_.isEmpty(event))
-        throw { message: "Event not found!!", code: "404_NOT_FOUND" };
+        throw { message: "Event not found!!", code: "NOT_FOUND", status: 404 };
 
       const user = await services.usersService.getUserById(args.user);
       if (_.isEmpty(user))
-        throw { message: "User not found!!", code: "404_NOT_FOUND" };
+        throw { message: "User not found!!", code: "NOT_FOUND", status: 404 };
 
       const newBooking = await services.bookingsService.bookEvent(
         args.event,
@@ -38,7 +38,7 @@ const mutations = {
       return transformData(newBooking._doc);
     } catch (err) {
       throw new GraphQLError(err.message, {
-        extensions: { code: err.code },
+        extensions: { code: err.code, http: err.status },
       });
     }
   },
@@ -46,7 +46,11 @@ const mutations = {
     try {
       const booking = await services.bookingsService.getBookingById(args._id);
       if (_.isEmpty(booking))
-        throw { message: "Booking not found!!", code: "404_NOT_FOUND" };
+        throw {
+          message: "Booking not found!!",
+          code: "NOT_FOUND",
+          status: 404,
+        };
 
       const canceledEvent = {
         ...booking.event,
@@ -54,14 +58,15 @@ const mutations = {
       if (_.isEmpty(canceledEvent))
         throw {
           message: "Event is missing..",
-          code: "500_INTERNAL_SERVER_ERROR",
+          code: "INTERNAL_SERVER_ERROR",
+          status: 500,
         };
 
       await services.bookingsService.deleteBooking(booking._id);
       return transformData(canceledEvent);
     } catch (err) {
       throw new GraphQLError(err.message, {
-        extensions: { code: err.code },
+        extensions: { code: err.code, http: err.status },
       });
     }
   },
