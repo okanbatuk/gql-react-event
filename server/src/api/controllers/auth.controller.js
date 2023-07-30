@@ -21,7 +21,6 @@ export const mutations = {
         extensions: { code: "VALIDATION_ERROR" },
       });
     let newUser = await authService.register(user);
-    newUser.password = null;
     return newUser;
   },
 
@@ -51,11 +50,12 @@ export const mutations = {
           code: "500_INTERNAL_SERVER_ERROR",
         };
 
-      // TODO: Generate new return type for user Login
-      // TODO: Add prop to return type for new token
-
-      loginUser.password = null;
-      return loginUser;
+      return {
+        ...loginUser,
+        createdAt: new Date(loginUser.createdAt).toISOString(),
+        updatedAt: new Date(loginUser.updatedAt).toISOString(),
+        accessToken,
+      };
     } catch (err) {
       throw new GraphQLError(err.message, {
         extensions: { code: err.code },

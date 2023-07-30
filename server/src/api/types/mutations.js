@@ -6,8 +6,8 @@ type Mutation {
   deleteEvent(_id: ID!): [Event]
 
   # Type of Auth Mutations
-  register(user: AuthInput!): User!
-  login(user: AuthInput!): User!
+  register(user: AuthInput!): RegUser!
+  login(user: AuthInput!): LoginUser!
 
   # Type of Booking Mutations
   bookEvent(event: ID!,user: ID!): Booking!

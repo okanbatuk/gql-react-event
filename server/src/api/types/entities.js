@@ -6,6 +6,8 @@ const entities = `
     price: Float!
     date: String!
     creator: User!
+    createdAt: String!
+    updatedAt: String!
   }
 
   type User {
@@ -13,6 +15,8 @@ const entities = `
     email: String!
     password: String
     createdEvents: [Event!]
+    createdAt: String!
+    updatedAt: String!
   }
   
   type Booking {

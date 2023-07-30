@@ -27,7 +27,7 @@ export const register = async (user) => {
 
     // Save and return the newUser
     await newUser.save();
-    return newUser;
+    return newUser._doc;
   } else {
     // If there is a conflict user return GraphQLError
     throw new GraphQLError("Username or email already in use..", {
@@ -39,7 +39,10 @@ export const register = async (user) => {
 export const login = async (userInfo) => {
   const { email, password } = userInfo;
   try {
-    const user = await User.findOne({ email: email.toLowerCase() }).lean();
+    const user = await User.findOne(
+      { email: email.toLowerCase() },
+      { createdEvents: 0 }
+    ).lean();
 
     let comparePwd = user && (await compare(password, user.password));
 
