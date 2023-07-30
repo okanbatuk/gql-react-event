@@ -8,7 +8,7 @@ export default (user) => {
   return new Promise(async (resolve) => {
     const { tokenSecret } = await import("../../configs/vars.js");
     const newAccessToken = jwt.sign(user, tokenSecret, {
-      expiresIn: "1h",
+      expiresIn: "10m",
     });
 
     resolve(newAccessToken);

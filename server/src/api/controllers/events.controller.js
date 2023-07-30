@@ -2,10 +2,14 @@ import _ from "lodash";
 import { GraphQLError } from "graphql";
 import { eventsService, usersService } from "../services/index.js";
 import transformData from "../utils/transformData.js";
+import checkContext from "../helpers/checkContext.js";
 
 const queries = {
-  events: async () => {
+  events: async (...[, , contextValue]) => {
     try {
+      // If there isn't an authenticated user return error
+      await checkContext(contextValue);
+
       // Get All Events
       const events = await eventsService.getEvents();
 
@@ -23,20 +27,31 @@ const queries = {
       });
     } catch (err) {
       throw new GraphQLError(err.message, {
-        extensions: { code: err.code, http: err.status },
+        extensions: { code: err.code, http: { status: err.status } },
       });
     }
   },
-  event: async (...[, args]) => {
-    // Get event according to _id
-    const event = await eventsService.getEventById(args._id);
+  event: async (...[, args, contextValue]) => {
+    try {
+      // If there isn't an authenticated user return error
+      await checkContext(contextValue);
 
-    // If event doesn't exist return error
-    if (_.isEmpty(event))
-      throw new GraphQLError("There is no event..", {
-        extensions: { code: "NOT_FOUND", http: 404 },
+      // Get event according to _id
+      const event = await eventsService.getEventById(args._id);
+
+      // If event doesn't exist return error
+      if (_.isEmpty(event))
+        throw {
+          message: "There is no event..",
+          code: "NOT_FOUND",
+          status: 404,
+        };
+      return transformData(event);
+    } catch (err) {
+      throw new GraphQLError(err.message, {
+        extensions: { code: err.code, http: { status: err.status } },
       });
-    return transformData(event);
+    }
   },
 };
 
@@ -56,15 +71,19 @@ const relations = {
       return transformData(event);
     } catch (err) {
       throw new GraphQLError(err.message, {
-        extensions: { code: err.code, http: err.status },
+        extensions: { code: err.code, http: { status: err.status } },
       });
     }
   },
 };
 
 const mutations = {
-  addEvent: async (_, args) => {
+  addEvent: async (...[, args, contextValue]) => {
     try {
+      // If there isn't an authenticated user return error
+      // TODO: this user will be creator. Then delete the creator from AddEventInput type
+      const user = await checkContext(contextValue);
+
       const { event } = args;
 
       // Check user by creator id
@@ -92,26 +111,34 @@ const mutations = {
       return transformData(newEvent._doc);
     } catch (err) {
       throw new GraphQLError(err.message, {
-        extensions: { code: err.code, http: err.status },
+        extensions: { code: err.code, http: { status: err.status } },
       });
     }
   },
 
   // Update Event
-  updateEvent: async (_, args) => {
+  updateEvent: async (...[, args, contextValue]) => {
     try {
+      // If there isn't an authenticated user return error
+      await checkContext(contextValue);
+
+      // Update the event
       let updatedEvent = await eventsService.updateEvent(args._id, args.edits);
-      return updatedEvent;
+      return transformData(updatedEvent._doc);
     } catch (err) {
       throw new GraphQLError(err.message, {
-        extensions: { code: err.code, http: err.status },
+        extensions: { code: err.code, http: { status: err.status } },
       });
     }
   },
 
   // Delete the Event
-  deleteEvent: async (_, args) => {
+  deleteEvent: async (...[, args, contextValue]) => {
     try {
+      // If there isn't an authenticated user return error
+      // TODO This user will only be able to delete their own events
+      const loginUser = await checkContext(contextValue);
+
       // Find the event
       const event = await eventsService.getEventById(args._id);
 
@@ -139,7 +166,7 @@ const mutations = {
       });
     } catch (err) {
       throw new GraphQLError(err.message, {
-        extensions: { code: err.code, http: err.status },
+        extensions: { code: err.code, http: { status: err.status } },
       });
     }
   },

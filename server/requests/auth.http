@@ -7,14 +7,13 @@ mutation ($user: AuthInput!) {
   register(user: $user) {
     _id
     email
-    password
   }
 }
 
 {
   "user": {
-    "email": "john@example.com",
-    "password": "John!1"
+    "email": "darmian@example.com",
+    "password": "Darmian!1"
   }
 }
 
@@ -27,13 +26,15 @@ mutation ($user: AuthInput!) {
   login(user: $user) {
     _id
     email
-    password
+    createdAt
+    updatedAt
+    accessToken
   }
 }
 
 {
   "user": {
-    "email": "john@example.com",
-    "password": "John!1"
+    "email": "darmian@example.com",
+    "password": "Darmian!1"
   }
 }

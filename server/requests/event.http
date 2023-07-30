@@ -3,6 +3,7 @@
 POST http://localhost:4000/graphql HTTP/1.1
 X-Request-Type: GraphQL
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiZGFybWlhbkBleGFtcGxlLmNvbSIsImlhdCI6MTY5MDc0MTU2OSwiZXhwIjoxNjkwNzQxNjI5fQ.VJr4iznG4WmNg6xRmOjeisPyU6EPdT6bCYknsux3GHw
 
 query {
   events {
@@ -23,6 +24,7 @@ query {
 POST http://localhost:4000/graphql HTTP/1.1
 X-Request-Type: GraphQL
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiZGFybWlhbkBleGFtcGxlLmNvbSIsImlhdCI6MTY5MDc0Mjk0MCwiZXhwIjoxNjkwNzQzNTQwfQ.eAi6PNyygMAVFrrLWi7hAyGf7rqeo7xtOG0SFm8b4kg
 
 query ($_id: ID!) {
   event(_id: $_id) {
@@ -39,7 +41,7 @@ query ($_id: ID!) {
 }
 
 {
-  "_id": "64c4e1e9afab567ad0281288"
+  "_id": "64c3caf57d88383cc432fac4"
 }
 
 ### CREATE EVENT
@@ -47,6 +49,7 @@ query ($_id: ID!) {
 POST http://localhost:4000/graphql HTTP/1.1
 Content-Type: application/json
 X-REQUEST-TYPE: GraphQL
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiZGFybWlhbkBleGFtcGxlLmNvbSIsImlhdCI6MTY5MDc0MTU2OSwiZXhwIjoxNjkwNzQxNjI5fQ.VJr4iznG4WmNg6xRmOjeisPyU6EPdT6bCYknsux3GHw
 
 mutation ($event: AddEventInput!) {
   addEvent(event: $event) {
@@ -60,11 +63,11 @@ mutation ($event: AddEventInput!) {
 
 {
   "event": {
-    "title": "Visit Museum",
+    "title": "Visit Ataturk House",
     "description": "New desc 2",
-    "price": 79.99,
+    "price": 59.99,
     "date": "2023-07-23T05:14:27.979Z",
-    "creator": "64beb21c383b7d285d1339e7"
+    "creator": "64c63101ba2efef9b597e9a7"
   }
 }
 
@@ -73,6 +76,7 @@ mutation ($event: AddEventInput!) {
 POST http://localhost:4000/graphql HTTP/1.1
 Content-Type: application/json
 X-REQUEST-TYPE: GraphQL
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiZGFybWlhbkBleGFtcGxlLmNvbSIsImlhdCI6MTY5MDc0MTU2OSwiZXhwIjoxNjkwNzQxNjI5fQ.VJr4iznG4WmNg6xRmOjeisPyU6EPdT6bCYknsux3GHw
 
 mutation ($_id: ID!, $edits: UpdateEventInput!) {
   updateEvent(_id: $_id, edits: $edits) {
@@ -85,11 +89,10 @@ mutation ($_id: ID!, $edits: UpdateEventInput!) {
 }
 
 {
-  "_id": "64bd83ea8fd26488d2da332a",
+  "_id": "64c673e080f625553ba6b5b4",
   "edits": {
-    "title": "Writing",
-    "description": "new DESC",
-    "price": 9.99
+    "title": "Visit Ataturk's house",
+    "description": "New desc 3"
   }
 }
 
@@ -98,6 +101,7 @@ mutation ($_id: ID!, $edits: UpdateEventInput!) {
 POST http://localhost:4000/graphql HTTP/1.1
 Content-Type: application/json
 X-REQUEST-TYPE: GraphQL
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiZGFybWlhbkBleGFtcGxlLmNvbSIsImlhdCI6MTY5MDc0MTU2OSwiZXhwIjoxNjkwNzQxNjI5fQ.VJr4iznG4WmNg6xRmOjeisPyU6EPdT6bCYknsux3GHw
 
 mutation ($_id: ID!) {
   deleteEvent(_id: $_id) {
@@ -110,5 +114,5 @@ mutation ($_id: ID!) {
 }
 
 {
-  "_id": "64c3bc358fb2086a10b9b68f"
+  "_id": "64c4e1e9afab567ad0281288"
 }

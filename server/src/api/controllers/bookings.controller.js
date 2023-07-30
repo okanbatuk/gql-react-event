@@ -2,34 +2,55 @@ import _ from "lodash";
 import { GraphQLError } from "graphql";
 import * as services from "../services/index.js";
 import transformData from "../utils/transformData.js";
+import checkContext from "../helpers/checkContext.js";
 
 const queries = {
-  bookings: async () => {
-    const bookings = await services.bookingsService.getAll();
+  bookings: async (...[, , contextValue]) => {
+    try {
+      // If there isn't an authenticated user return error
+      const user = await checkContext(contextValue);
 
-    if (!bookings.length)
-      throw new GraphQLError("There is no Booking", {
-        extensions: { code: "NOT_FOUND", http: 404 },
+      // Get all bookings
+      const bookings = await services.bookingsService.getAll();
+
+      // If there is no booking return error
+      if (!bookings.length)
+        throw {
+          message: "There is no Booking",
+          code: "NOT_FOUND",
+          status: 404,
+        };
+
+      // Convert to dates
+      return bookings.map((booking) => {
+        return transformData(booking);
       });
-
-    // Convert to dates
-    return bookings.map((booking) => {
-      return transformData(booking);
-    });
+    } catch (err) {
+      throw new GraphQLError(err.message, {
+        extensions: { code: err.code, http: { status: err.status } },
+      });
+    }
   },
 };
 
 const mutations = {
-  bookEvent: async (...[, args]) => {
+  bookEvent: async (...[, args, contextValue]) => {
     try {
+      // If there isn't an authenticated user return error
+      // TODO This user'll book an event
+      const loginUser = await checkContext(contextValue);
+
+      // Get event
       const event = await services.eventsService.getEventById(args.event);
       if (_.isEmpty(event))
         throw { message: "Event not found!!", code: "NOT_FOUND", status: 404 };
 
+      // Get user
       const user = await services.usersService.getUserById(args.user);
       if (_.isEmpty(user))
         throw { message: "User not found!!", code: "NOT_FOUND", status: 404 };
 
+      // Create a new Book
       const newBooking = await services.bookingsService.bookEvent(
         args.event,
         args.user
@@ -38,12 +59,17 @@ const mutations = {
       return transformData(newBooking._doc);
     } catch (err) {
       throw new GraphQLError(err.message, {
-        extensions: { code: err.code, http: err.status },
+        extensions: { code: err.code, http: { status: err.status } },
       });
     }
   },
-  cancelBooking: async (...[, args]) => {
+  cancelBooking: async (...[, args, contextValue]) => {
     try {
+      // If there isn't an authenticated user return error
+      // TODO This user can only cancel their own booking
+      const loginUser = await checkContext(contextValue);
+
+      // Get the booking
       const booking = await services.bookingsService.getBookingById(args._id);
       if (_.isEmpty(booking))
         throw {
@@ -62,11 +88,12 @@ const mutations = {
           status: 500,
         };
 
+      // Delete the booking
       await services.bookingsService.deleteBooking(booking._id);
       return transformData(canceledEvent);
     } catch (err) {
       throw new GraphQLError(err.message, {
-        extensions: { code: err.code, http: err.status },
+        extensions: { code: err.code, http: { status: err.status } },
       });
     }
   },

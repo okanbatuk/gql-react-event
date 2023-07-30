@@ -2,6 +2,25 @@
 POST http://localhost:4000/graphql HTTP/1.1
 X-Request-Type: GraphQL
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiZGFybWlhbkBleGFtcGxlLmNvbSIsImlhdCI6MTY5MDczNzIyNywiZXhwIjoxNjkwNzQwODI3fQ.K7vMjVm58JJ7mzh3WYxKCvi8lzL7fytNwuQEJLJi0mo
+
+query {
+  users{
+    _id
+    email
+    createdEvents {
+      title
+      description
+      date
+    }
+  }
+}
+
+###
+POST http://localhost:4000/graphql HTTP/1.1
+X-Request-Type: GraphQL
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiZGFybWlhbkBleGFtcGxlLmNvbSIsImlhdCI6MTY5MDczNzIyNywiZXhwIjoxNjkwNzQwODI3fQ.K7vMjVm58JJ7mzh3WYxKCvi8lzL7fytNwuQEJLJi0mo
 
 query ($_id: ID!) {
   user(_id: $_id) {

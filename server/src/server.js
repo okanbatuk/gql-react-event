@@ -7,6 +7,7 @@ import app from "./configs/express.js";
 import { typeDefs, resolvers } from "./configs/schema.js";
 import * as error from "./api/middlewares/errors.js";
 import { port } from "./configs/vars.js";
+import generateContext from "./api/utils/generateContext.js";
 
 const PORT = port || 4000;
 const httpServer = http.createServer(app);
@@ -36,7 +37,12 @@ mongoose.connection.once("open", async () => {
     await server.start();
 
     // Create route for GraphQL queries and mutations
-    app.use("/graphql", expressMiddleware(server));
+    app.use(
+      "/graphql",
+      expressMiddleware(server, {
+        context: async ({ req }) => await generateContext(req),
+      })
+    );
 
     /*
      * Error Handling

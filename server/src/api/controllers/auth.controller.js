@@ -1,5 +1,6 @@
 import { GraphQLError } from "graphql";
 import { authService } from "../services/index.js";
+import transformData from "../utils/transformData.js";
 
 const MAIL_REGEX =
   /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -13,15 +14,28 @@ const validation = (user) => {
 
 export const mutations = {
   register: async (_, args) => {
-    const { user } = args;
-    const validate = await validation(user);
+    try {
+      const { user } = args;
 
-    if (!validate)
-      throw new GraphQLError("ValidationError", {
-        extensions: { code: "VALIDATION_ERROR", http: 400 },
+      // Validate the email and password field
+      const validate = await validation(user);
+
+      // If validate is false return validation error
+      if (!validate)
+        throw {
+          message: "ValidationError",
+          code: "VALIDATION_ERROR",
+          status: 400,
+        };
+
+      // Create a new User
+      let newUser = await authService.register(user);
+      return transformData(newUser._doc);
+    } catch (err) {
+      throw new GraphQLError(err.message, {
+        extensions: { code: err.code, http: { status: err.status } },
       });
-    let newUser = await authService.register(user);
-    return newUser;
+    }
   },
 
   login: async (_, args) => {
@@ -47,7 +61,6 @@ export const mutations = {
 
       // Generate new Token
       let accessToken = await generateToken({ user: loginUser.email });
-
       if (!accessToken)
         throw {
           message: "Something went wrong",
@@ -56,14 +69,12 @@ export const mutations = {
         };
 
       return {
-        ...loginUser,
-        createdAt: new Date(loginUser.createdAt).toISOString(),
-        updatedAt: new Date(loginUser.updatedAt).toISOString(),
+        ...transformData(loginUser),
         accessToken,
       };
     } catch (err) {
       throw new GraphQLError(err.message, {
-        extensions: { code: err.code, http: err.status },
+        extensions: { code: err.code, http: { status: err.status } },
       });
     }
   },
