@@ -1,5 +1,4 @@
 import { hash, compare } from "bcrypt";
-import { GraphQLError } from "graphql";
 import User from "../models/User.js";
 
 export const register = async (user) => {

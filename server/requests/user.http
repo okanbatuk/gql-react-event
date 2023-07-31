@@ -2,13 +2,14 @@
 POST http://localhost:4000/graphql HTTP/1.1
 X-Request-Type: GraphQL
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiZGFybWlhbkBleGFtcGxlLmNvbSIsImlhdCI6MTY5MDczNzIyNywiZXhwIjoxNjkwNzQwODI3fQ.K7vMjVm58JJ7mzh3WYxKCvi8lzL7fytNwuQEJLJi0mo
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImRhcm1pYW5AZXhhbXBsZS5jb20iLCJpYXQiOjE2OTA4Mjk1MTUsImV4cCI6MTY5MDgzMDExNX0.petLH5uuNC65RJ9-oDOKgFoFQpZ_HjZDBw_aAh1Zbkg
 
 query {
   users{
     _id
     email
     createdEvents {
+      _id
       title
       description
       date
@@ -20,7 +21,7 @@ query {
 POST http://localhost:4000/graphql HTTP/1.1
 X-Request-Type: GraphQL
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiZGFybWlhbkBleGFtcGxlLmNvbSIsImlhdCI6MTY5MDczNzIyNywiZXhwIjoxNjkwNzQwODI3fQ.K7vMjVm58JJ7mzh3WYxKCvi8lzL7fytNwuQEJLJi0mo
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImRhcm1pYW5AZXhhbXBsZS5jb20iLCJpYXQiOjE2OTA4Mjk1MTUsImV4cCI6MTY5MDgzMDExNX0.petLH5uuNC65RJ9-oDOKgFoFQpZ_HjZDBw_aAh1Zbkg
 
 query ($_id: ID!) {
   user(_id: $_id) {
@@ -35,5 +36,5 @@ query ($_id: ID!) {
 }
 
 {
-  "_id": "64beb21c383b7d285d1339e7"
+  "_id": "64c63101ba2efef9b597e9a7"
 }

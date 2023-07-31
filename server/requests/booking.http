@@ -3,7 +3,7 @@
 POST http://localhost:4000/graphql HTTP/1.1
 X-Request-Type: GraphQL
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiZGFybWlhbkBleGFtcGxlLmNvbSIsImlhdCI6MTY5MDczNzIyNywiZXhwIjoxNjkwNzQwODI3fQ.K7vMjVm58JJ7mzh3WYxKCvi8lzL7fytNwuQEJLJi0mo
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImRhcm1pYW5AZXhhbXBsZS5jb20iLCJpYXQiOjE2OTA4MjcyNzQsImV4cCI6MTY5MDgyNzg3NH0.lFuNeVbXlavvHIBx3XHkqg9ML18NV_YuUxedMp5FqG4
 
 query {
   bookings {
@@ -29,7 +29,7 @@ query {
 POST http://localhost:4000/graphql HTTP/1.1
 Content-Type: application/json
 X-REQUEST-TYPE: GraphQL
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiZGFybWlhbkBleGFtcGxlLmNvbSIsImlhdCI6MTY5MDczNzIyNywiZXhwIjoxNjkwNzQwODI3fQ.K7vMjVm58JJ7mzh3WYxKCvi8lzL7fytNwuQEJLJi0mo
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImRhcm1pYW5AZXhhbXBsZS5jb20iLCJpYXQiOjE2OTA4MjcyNzQsImV4cCI6MTY5MDgyNzg3NH0.lFuNeVbXlavvHIBx3XHkqg9ML18NV_YuUxedMp5FqG4
 
 mutation ($event: ID!, $user: ID!) {
   bookEvent(event: $event, user: $user) {
@@ -40,8 +40,8 @@ mutation ($event: ID!, $user: ID!) {
 }
 
 {
-  "event": "64c673e080f625553ba6b5b4",
-  "user": "64beb21c383b7d285d1339e7"
+  "event": "64c7fa674a1046201b133326",
+  "user": "64c6717e686aa9f9d5fb3d7c"
 }
 
 ### CANCEL THE BOOKING
@@ -49,6 +49,7 @@ mutation ($event: ID!, $user: ID!) {
 POST http://localhost:4000/graphql HTTP/1.1
 X-Request-Type: GraphQL
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImRhcm1pYW5AZXhhbXBsZS5jb20iLCJpYXQiOjE2OTA4MjcyNzQsImV4cCI6MTY5MDgyNzg3NH0.lFuNeVbXlavvHIBx3XHkqg9ML18NV_YuUxedMp5FqG4
 
 mutation ($_id: ID!) {
   cancelBooking(_id: $_id) {
@@ -62,5 +63,5 @@ mutation ($_id: ID!) {
 }
 
 {
-  "_id": "64c503da7573f957c60a5164"
+  "_id": "64c67606a86f02cf0cdd0f2f"
 }

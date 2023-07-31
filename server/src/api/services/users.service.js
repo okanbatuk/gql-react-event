@@ -2,30 +2,20 @@ import User from "../models/User.js";
 
 // Get All Users
 export const getAll = async () => {
-  return new Promise(async (resolve, reject) => {
-    const users = await User.find().lean();
-    users.length
-      ? resolve(users)
-      : reject({
-          message: "There is no user..",
-          code: "NOT_FOUND",
-          status: 404,
-        });
-  });
+  const users = await User.find().lean();
+  return users;
 };
 
-// Get User according to objectId
+// Get User by _id
 export const getUserById = async (_id) => {
-  return new Promise(async (resolve, reject) => {
-    const user = await User.findById(_id).lean();
-    user
-      ? resolve(user)
-      : reject({
-          message: "There is no user..",
-          code: "NOT_FOUND",
-          status: 404,
-        });
-  });
+  const user = await User.findById(_id).lean();
+  return user;
+};
+
+// Get user by email
+export const getUserByEmail = async (email) => {
+  const user = await User.findOne({ email }).lean();
+  return user;
 };
 
 // Push the event id to user's prop when creating new event
@@ -36,9 +26,7 @@ export const findAndAddEvent = async (_id, event_id) => {
     { $push: { createdEvents: event_id } }
   );
 
-  const user = modifiedCount && (await User.findById(_id).lean());
-
-  return user;
+  return modifiedCount;
 };
 
 // Delete the event id from user.createdEvents array when deleting the event
@@ -47,8 +35,5 @@ export const findAndDeleteEvent = async (_id, event_id) => {
     { _id },
     { $pull: { createdEvents: event_id } }
   );
-
-  const user = modifiedCount && (await User.findById(_id).lean());
-
-  return user;
+  return modifiedCount;
 };
