@@ -1,6 +1,6 @@
 export default async (req) => {
   try {
-    let user = "";
+    let email = "";
     const token = req.headers?.authorization?.split(" ")[1];
 
     // Validate token if token, otherwise continue
@@ -9,9 +9,9 @@ export default async (req) => {
         "../middlewares/verifyAuth.js"
       );
       // Verify the token
-      user = await verifyToken(token);
+      email = await verifyToken(token);
     }
-    return { email: user };
+    return { email };
   } catch (err) {
     const { GraphQLError } = await import("graphql");
     throw new GraphQLError(err.message, {

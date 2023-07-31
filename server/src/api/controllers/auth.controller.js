@@ -60,7 +60,7 @@ export const mutations = {
       );
 
       // Generate new Token
-      let accessToken = await generateToken({ user: loginUser.email });
+      let accessToken = await generateToken({ email: loginUser.email });
       if (!accessToken)
         throw {
           message: "Something went wrong",

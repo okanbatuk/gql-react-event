@@ -8,10 +8,11 @@ export default (token) => {
     // Verify the token
     jwt.verify(token, tokenSecret, (err, decoded) => {
       // If there was an error eg token expired etc. Return error
-      if (err) reject({ message: err.message, code: "FORBIDDEN", status: 403 });
+      if (err)
+        return reject({ message: err.message, code: "FORBIDDEN", status: 403 });
 
       // Return the user who wants to login
-      resolve(decoded);
+      resolve(decoded.email);
     });
   });
 };
