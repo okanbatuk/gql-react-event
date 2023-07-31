@@ -1,25 +1,16 @@
-import _ from "lodash";
 import { GraphQLError } from "graphql";
-import { eventsService, usersService } from "../services/index.js";
+import { eventsService as es, usersService as us } from "../services/index.js";
 import transformData from "../utils/transformData.js";
-import checkContext from "../helpers/checkContext.js";
+import checkField from "../helpers/checkField.js";
 
 const queries = {
-  events: async (...[, , contextValue]) => {
+  events: async () => {
     try {
-      // If there isn't an authenticated user return error
-      await checkContext(contextValue);
-
       // Get All Events
-      const events = await eventsService.getEvents();
+      const events = await es.getEvents();
 
-      // If there is no events return error
-      if (!events.length)
-        throw {
-          message: "There is no events..",
-          code: "NOT_FOUND",
-          status: 404,
-        };
+      // Check if events variable is empty
+      await checkField(events, "Event");
 
       // Convert the date props
       return events.map((event) => {
@@ -31,21 +22,14 @@ const queries = {
       });
     }
   },
-  event: async (...[, args, contextValue]) => {
+  event: async (...[, args]) => {
     try {
-      // If there isn't an authenticated user return error
-      await checkContext(contextValue);
-
       // Get event according to _id
-      const event = await eventsService.getEventById(args._id);
+      const event = await es.getEventById(args._id);
 
-      // If event doesn't exist return error
-      if (_.isEmpty(event))
-        throw {
-          message: "There is no event..",
-          code: "NOT_FOUND",
-          status: 404,
-        };
+      // Check if event variable is empty
+      await checkField(event, "Event");
+
       return transformData(event);
     } catch (err) {
       throw new GraphQLError(err.message, {
@@ -57,7 +41,7 @@ const queries = {
 
 const relations = {
   createdEvents: async (parent) => {
-    const events = await eventsService.getUserEvents(parent._id);
+    const events = await es.getUserEvents(parent._id);
     return events.map((event) => {
       return transformData(event);
     });
@@ -65,9 +49,10 @@ const relations = {
 
   event: async (parent) => {
     try {
-      const event = await eventsService.getEventById(parent.event);
-      if (_.isEmpty(event))
-        throw { message: "There is no user..", code: "NOT_FOUND", status: 404 };
+      const event = await es.getEventById(parent.event);
+      // Check if event variable is empty
+      await checkField(event, "Event");
+
       return transformData(event);
     } catch (err) {
       throw new GraphQLError(err.message, {
@@ -80,27 +65,20 @@ const relations = {
 const mutations = {
   addEvent: async (...[, args, contextValue]) => {
     try {
-      // If there isn't an authenticated user return error
-      // TODO: this user will be creator. Then delete the creator from AddEventInput type
-      const user = await checkContext(contextValue);
+      const { email } = contextValue;
 
-      const { event } = args;
-
-      // Check user by creator id
-      await usersService.getUserById(event.creator);
+      // Get user according to login user
+      const user = await us.getUserByEmail(email);
 
       // Create and return new Event
-      const newEvent = await eventsService.createEvent(args.event);
+      const newEvent = await es.createEvent(args.event, user._id);
 
       // Push the new Event id to user.createdEvents array
-      const savedUser = await usersService.findAndAddEvent(
-        event.creator,
-        newEvent._id
-      );
+      const modifiedCount = await us.findAndAddEvent(user._id, newEvent._id);
 
       // If update didn't successfully, delete the event and return error
-      if (!savedUser) {
-        await eventsService.deleteEvent(newEvent._id);
+      if (!modifiedCount) {
+        await es.deleteEvent(newEvent._id);
         throw {
           message: "Something went wrong..",
           code: "BAD_REQUEST",
@@ -119,11 +97,22 @@ const mutations = {
   // Update Event
   updateEvent: async (...[, args, contextValue]) => {
     try {
-      // If there isn't an authenticated user return error
-      await checkContext(contextValue);
+      const { email } = contextValue;
 
-      // Update the event
-      let updatedEvent = await eventsService.updateEvent(args._id, args.edits);
+      // Get user according to login user
+      const user = await us.getUserByEmail(email);
+
+      // Update the event.
+      // User'll only be able to update their own events
+      let updatedEvent = await es.updateEvent(args, user._id);
+      const _ = await import("lodash");
+      if (_.isEmpty(updatedEvent))
+        throw {
+          message: "Can not update the event.",
+          code: "FORBIDDEN",
+          status: 403,
+        };
+
       return transformData(updatedEvent._doc);
     } catch (err) {
       throw new GraphQLError(err.message, {
@@ -135,32 +124,44 @@ const mutations = {
   // Delete the Event
   deleteEvent: async (...[, args, contextValue]) => {
     try {
-      // If there isn't an authenticated user return error
-      // TODO This user will only be able to delete their own events
-      const loginUser = await checkContext(contextValue);
+      const { email } = contextValue;
 
       // Find the event
-      const event = await eventsService.getEventById(args._id);
+      const event = await es.getEventById(args._id);
 
-      if (!event)
-        throw { message: "Event doesn't exist..", code: "404_NOT_FOUND" };
+      // Check if event variable is empty
+      await checkField(event, "Event");
 
-      // Delete the event id on user before deleting the event
-      const user = await usersService.findAndDeleteEvent(
-        event.creator,
-        event._id
-      );
+      // Get user according to login user
+      const user = await us.getUserByEmail(email);
 
-      // If there is no updated user return GraphQL Error
-      if (!user)
+      // Delete all bookings of the event
+      const { bookingsService: bs } = await import("../services/index.js");
+      const acknowledged = await bs.deleteBookingsByEventId(event._id);
+      if (!acknowledged)
         throw {
-          message: "This event is not associated with any user..",
+          message: "Something went wrong..",
           code: "INTERNAL_SERVER_ERROR",
           status: 500,
         };
 
+      // Delete the event id on user before deleting the event
+      await us.findAndDeleteEvent(user._id, event._id);
+
       // Delete the event and return the new Event List
-      let newEventList = await eventsService.deleteEvent(event._id);
+      const deletedCount = await es.deleteEvent(event._id, user._id);
+
+      // If deletedCount is equal to 0 return error
+      if (!deletedCount)
+        throw {
+          message: "You don't have Permission..",
+          code: "FORBIDDEN",
+          status: 403,
+        };
+
+      // Get user's events
+      const newEventList = await es.getUserEvents(user._id);
+
       return newEventList.map((event) => {
         return transformData(event);
       });

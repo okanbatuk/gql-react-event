@@ -1,8 +1,7 @@
-import _ from "lodash";
-export default (context = {}) => {
+export const checkContext = (context = {}) => {
   return new Promise((resolve, reject) => {
-    !_.isEmpty(context.user)
-      ? resolve(context.user)
+    context?.email
+      ? resolve(context.email)
       : reject({
           message: "Token not provided",
           code: "BAD_REQUEST",
@@ -10,3 +9,7 @@ export default (context = {}) => {
         });
   });
 };
+
+const publicOps = ["login", "register"];
+
+export const checkOps = (operation) => publicOps.includes(operation);

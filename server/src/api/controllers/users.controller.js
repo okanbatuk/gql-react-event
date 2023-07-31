@@ -1,17 +1,16 @@
-import _ from "lodash";
 import { GraphQLError } from "graphql";
 import { usersService } from "../services/index.js";
 import transformData from "../utils/transformData.js";
-import checkContext from "../helpers/checkContext.js";
+import checkField from "../helpers/checkField.js";
 
 export const queries = {
-  users: async (...[, , contextValue]) => {
+  users: async () => {
     try {
-      // If there isn't an authenticated user return error
-      await checkContext(contextValue);
-
       // Get All Users
       const users = await usersService.getAll();
+
+      // Check if users variable is empty
+      await checkField(users, "User");
 
       // Transform info of all users
       return users.map((user) => transformData(user));
@@ -21,13 +20,14 @@ export const queries = {
       });
     }
   },
-  user: async (...[, args, contextValue]) => {
+  user: async (...[, args]) => {
     try {
-      // If there isn't an authenticated user return error
-      await checkContext(contextValue);
-
       // Get the user by id
       const user = await usersService.getUserById(args._id);
+
+      // Check if user is empty
+      await checkField(user, "User");
+
       return transformData(user);
     } catch (err) {
       throw new GraphQLError(err.message, {
@@ -42,6 +42,10 @@ export const relations = {
   creator: async (parent) => {
     try {
       const user = await usersService.getUserById(parent.creator);
+
+      // Check if user is empty
+      await checkField(user, "User");
+
       return transformData(user);
     } catch (err) {
       throw new GraphQLError(err.message, {
@@ -54,6 +58,10 @@ export const relations = {
   user: async (parent) => {
     try {
       const user = await usersService.getUserById(parent.user);
+
+      // Check if user is empty
+      await checkField(user, "User");
+
       return transformData(user);
     } catch (err) {
       throw new GraphQLError(err.message, {
