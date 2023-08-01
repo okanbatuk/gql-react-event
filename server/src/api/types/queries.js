@@ -2,6 +2,8 @@ const queries = `
 type Query {
   hello: String
 
+  login(user: AuthInput!): LoginUser!
+
   events: [Event!]!
   event(_id: ID!): Event!
 

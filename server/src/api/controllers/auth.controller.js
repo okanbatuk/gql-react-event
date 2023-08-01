@@ -12,32 +12,7 @@ const validation = (user) => {
   });
 };
 
-export const mutations = {
-  register: async (_, args) => {
-    try {
-      const { user } = args;
-
-      // Validate the email and password field
-      const validate = await validation(user);
-
-      // If validate is false return validation error
-      if (!validate)
-        throw {
-          message: "ValidationError",
-          code: "VALIDATION_ERROR",
-          status: 400,
-        };
-
-      // Create a new User
-      let newUser = await authService.register(user);
-      return transformData(newUser._doc);
-    } catch (err) {
-      throw new GraphQLError(err.message, {
-        extensions: { code: err.code, http: { status: err.status } },
-      });
-    }
-  },
-
+export const queries = {
   login: async (_, args) => {
     try {
       const { user } = args;
@@ -72,6 +47,33 @@ export const mutations = {
         ...transformData(loginUser),
         accessToken,
       };
+    } catch (err) {
+      throw new GraphQLError(err.message, {
+        extensions: { code: err.code, http: { status: err.status } },
+      });
+    }
+  },
+};
+
+export const mutations = {
+  register: async (_, args) => {
+    try {
+      const { user } = args;
+
+      // Validate the email and password field
+      const validate = await validation(user);
+
+      // If validate is false return validation error
+      if (!validate)
+        throw {
+          message: "ValidationError",
+          code: "VALIDATION_ERROR",
+          status: 400,
+        };
+
+      // Create a new User
+      let newUser = await authService.register(user);
+      return transformData(newUser._doc);
     } catch (err) {
       throw new GraphQLError(err.message, {
         extensions: { code: err.code, http: { status: err.status } },

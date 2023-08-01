@@ -7,7 +7,6 @@ type Mutation {
 
   # Type of Auth Mutations
   register(user: AuthInput!): RegUser!
-  login(user: AuthInput!): LoginUser!
 
   # Type of Booking Mutations
   bookEvent(event: ID!,user: ID!): Booking!

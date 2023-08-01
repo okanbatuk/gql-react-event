@@ -7,6 +7,7 @@ export const typeDefs = buildSchema(schema);
 export const resolvers = {
   Query: {
     hello: () => "Hello World!",
+    ...controllers.authController.queries,
     ...controllers.eventsController.queries,
     ...controllers.usersController.queries,
     ...controllers.bookingsController.queries,
@@ -27,11 +28,11 @@ export const resolvers = {
   },
 
   Mutation: {
-    // Mutations of Events
-    ...controllers.eventsController.mutations,
-
     // Mutations of Auth
     ...controllers.authController.mutations,
+
+    // Mutations of Events
+    ...controllers.eventsController.mutations,
 
     // Mutations of Bookings
     ...controllers.bookingsController.mutations,
