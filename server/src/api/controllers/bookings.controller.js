@@ -1,25 +1,29 @@
 import _ from "lodash";
 import { GraphQLError } from "graphql";
-import * as services from "../services/index.js";
+import {
+  bookingsService as bs,
+  usersService as us,
+  eventsService as es,
+} from "../services/index.js";
 import transformData from "../utils/transformData.js";
-import checkContext from "../helpers/checkContext.js";
+import checkField from "../helpers/checkField.js";
 
 const queries = {
   bookings: async (...[, , contextValue]) => {
     try {
-      // If there isn't an authenticated user return error
-      const user = await checkContext(contextValue);
+      const { email } = contextValue;
+
+      // Get user by email
+      const user = await us.getUserByEmail(email);
+
+      // Check for user variable
+      await checkField(user, "User");
 
       // Get all bookings
-      const bookings = await services.bookingsService.getAll();
+      const bookings = await bs.getBookingByUserId(user._id);
 
-      // If there is no booking return error
-      if (!bookings.length)
-        throw {
-          message: "There is no Booking",
-          code: "NOT_FOUND",
-          status: 404,
-        };
+      // Check if bookings variable is empty
+      await checkField(bookings, "Booking");
 
       // Convert to dates
       return bookings.map((booking) => {
@@ -36,25 +40,22 @@ const queries = {
 const mutations = {
   bookEvent: async (...[, args, contextValue]) => {
     try {
-      // If there isn't an authenticated user return error
-      // TODO This user'll book an event
-      const loginUser = await checkContext(contextValue);
-
-      // Get event
-      const event = await services.eventsService.getEventById(args.event);
-      if (_.isEmpty(event))
-        throw { message: "Event not found!!", code: "NOT_FOUND", status: 404 };
+      const { email } = contextValue;
 
       // Get user
-      const user = await services.usersService.getUserById(args.user);
-      if (_.isEmpty(user))
-        throw { message: "User not found!!", code: "NOT_FOUND", status: 404 };
+      const user = await us.getUserByEmail(email);
+
+      // Check if user is empty
+      await checkField(user, "User");
+
+      // Get event
+      const event = await es.getEventById(args.event);
+
+      // Check if event is empty
+      await checkField(event, "Event");
 
       // Create a new Book
-      const newBooking = await services.bookingsService.bookEvent(
-        args.event,
-        args.user
-      );
+      const newBooking = await bs.bookEvent(event._id, user._id);
 
       return transformData(newBooking._doc);
     } catch (err) {
@@ -65,22 +66,23 @@ const mutations = {
   },
   cancelBooking: async (...[, args, contextValue]) => {
     try {
-      // If there isn't an authenticated user return error
-      // TODO This user can only cancel their own booking
-      const loginUser = await checkContext(contextValue);
+      const { email } = contextValue;
+
+      // Get user by email
+      const user = await us.getUserByEmail(email);
 
       // Get the booking
-      const booking = await services.bookingsService.getBookingById(args._id);
-      if (_.isEmpty(booking))
-        throw {
-          message: "Booking not found!!",
-          code: "NOT_FOUND",
-          status: 404,
-        };
+      // User can only cancel their own bookings
+      const booking = await bs.getBookingsById(args._id, user._id);
+
+      // Check if booking variable is empty
+      await checkField(booking, "Booking");
 
       const canceledEvent = {
         ...booking.event,
       };
+
+      // Check the canceled event obj
       if (_.isEmpty(canceledEvent))
         throw {
           message: "Event is missing..",
@@ -89,7 +91,7 @@ const mutations = {
         };
 
       // Delete the booking
-      await services.bookingsService.deleteBooking(booking._id);
+      await bs.deleteBooking(booking._id);
       return transformData(canceledEvent);
     } catch (err) {
       throw new GraphQLError(err.message, {

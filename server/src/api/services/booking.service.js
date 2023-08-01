@@ -9,11 +9,19 @@ export const getAll = async () => {
 };
 
 // Get booking by id
-export const getBookingById = async (bookingId) => {
-  const booking = await Booking.findOne({ _id: bookingId })
+export const getBookingById = async (bookingId, userId) => {
+  const booking = await Booking.findOne({ _id: bookingId, user: userId })
     .populate("event")
     .lean();
   return booking;
+};
+
+// Get booking by user id
+export const getBookingsByUserId = async (userId) => {
+  const bookings = await Booking.find({ user: userId })
+    .populate("event")
+    .lean();
+  return bookings;
 };
 
 // Booking an Event
@@ -48,4 +56,10 @@ export const deleteBooking = (bookingId) => {
           status: 500,
         });
   });
+};
+
+// Cancel bookings according to event
+export const deleteBookingsByEventId = async (eventId) => {
+  const { acknowledged } = await Booking.deleteMany({ event: eventId });
+  return acknowledged;
 };

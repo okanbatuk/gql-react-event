@@ -9,7 +9,7 @@ type Mutation {
   register(user: AuthInput!): RegUser!
 
   # Type of Booking Mutations
-  bookEvent(event: ID!,user: ID!): Booking!
+  bookEvent(event: ID!): Booking!
   cancelBooking(_id: ID!): Event!
 }`;
 
