@@ -2,7 +2,7 @@
 POST http://localhost:4000/graphql HTTP/1.1
 X-Request-Type: GraphQL
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImRhcm1pYW5AZXhhbXBsZS5jb20iLCJpYXQiOjE2OTA4Mjk1MTUsImV4cCI6MTY5MDgzMDExNX0.petLH5uuNC65RJ9-oDOKgFoFQpZ_HjZDBw_aAh1Zbkg
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImRhcm1pYW5AZXhhbXBsZS5jb20iLCJpYXQiOjE2OTA5MDA1MDgsImV4cCI6MTY5MDkwMTEwOH0.QPTt4VxUK6CEwaPThV0jNwyjfOC4OGSoXP1kUPiUyoQ
 
 query {
   users{
@@ -21,7 +21,7 @@ query {
 POST http://localhost:4000/graphql HTTP/1.1
 X-Request-Type: GraphQL
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImRhcm1pYW5AZXhhbXBsZS5jb20iLCJpYXQiOjE2OTA4Mjk1MTUsImV4cCI6MTY5MDgzMDExNX0.petLH5uuNC65RJ9-oDOKgFoFQpZ_HjZDBw_aAh1Zbkg
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImRhcm1pYW5AZXhhbXBsZS5jb20iLCJpYXQiOjE2OTA5MDA1MDgsImV4cCI6MTY5MDkwMTEwOH0.QPTt4VxUK6CEwaPThV0jNwyjfOC4OGSoXP1kUPiUyoQ
 
 query ($_id: ID!) {
   user(_id: $_id) {

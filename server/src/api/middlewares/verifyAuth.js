@@ -9,7 +9,11 @@ export default (token) => {
     jwt.verify(token, tokenSecret, (err, decoded) => {
       // If there was an error eg token expired etc. Return error
       if (err)
-        return reject({ message: err.message, code: "FORBIDDEN", status: 403 });
+        return reject({
+          message: err.message,
+          code: "UNAUTHORIZED",
+          status: 401,
+        });
 
       // Return the user who wants to login
       resolve(decoded.email);

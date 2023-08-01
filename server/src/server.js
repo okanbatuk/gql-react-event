@@ -4,9 +4,9 @@ import { expressMiddleware } from "@apollo/server/express4";
 import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer";
 import mongoose from "mongoose";
 import app from "./configs/express.js";
+import { port } from "./configs/vars.js";
 import { typeDefs, resolvers } from "./configs/schema.js";
 import * as error from "./api/middlewares/errors.js";
-import { port } from "./configs/vars.js";
 import generateContext from "./api/utils/generateContext.js";
 import { checkContext, checkOps } from "./api/helpers/checkContext.js";
 
@@ -68,7 +68,7 @@ mongoose.connection.once("open", async () => {
     app.use(
       "/graphql",
       expressMiddleware(server, {
-        context: ({ req }) => generateContext(req),
+        context: generateContext,
       })
     );
 

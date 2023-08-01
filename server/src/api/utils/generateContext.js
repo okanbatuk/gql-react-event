@@ -1,4 +1,4 @@
-export default async (req) => {
+export default async ({ req }) => {
   try {
     let email = "";
     const token = req.headers?.authorization?.split(" ")[1];
